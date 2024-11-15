@@ -6,7 +6,6 @@ import TaskApp from './TaskApp';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    {/* <App /> */}
-    <TaskApp />
+    <App />
   </React.StrictMode>
 );

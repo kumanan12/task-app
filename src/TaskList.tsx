@@ -1,81 +1,94 @@
 import { useState } from 'react';
+import { useTasks, useTasksDispatch } from './TasksContext.js';
 
-export default function TaskList({
-  tasks,
-  onChangeTask,
-  onDeleteTask
-}) {
+export default function TaskList() {
+  const tasks = useTasks();
   return (
-    <ul className="space-y-2">
+    <div className="bg-white shadow-md rounded-lg p-4">
+      <ul>
       {tasks.map(task => (
-        <li key={task.id} className="bg-white shadow rounded p-2">
-          <Task
-            task={task}
-            onChange={onChangeTask}
-            onDelete={onDeleteTask}
-          />
+        <li key={task.id} className="mb-2">
+        <Task task={task} />
         </li>
       ))}
-    </ul>
+      </ul>
+    </div>
   );
 }
 
-function Task({ task, onChange, onDelete }) {
+function Task({ task }) {
   const [isEditing, setIsEditing] = useState(false);
+  const dispatch = useTasksDispatch();
   let taskContent;
   if (isEditing) {
     taskContent = (
-      <div className="flex items-center space-x-2">
+      <>
         <input
-          className="border border-gray-300 rounded px-2 py-1"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
           value={task.text}
           onChange={e => {
-            onChange({
-              ...task,
-              text: e.target.value
-            });
+        dispatch({
+          type: 'changed',
+          task: {
+            ...task,
+            text: e.target.value
+          }
+        });
           }} />
-        <button
-          className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
-          onClick={() => setIsEditing(false)}
-        >
-          Save
-        </button>
-      </div>
+       
+      </>
     );
   } else {
     taskContent = (
-      <div className="flex items-center space-x-2">
-        <span>{task.text}</span>
-        <button
-          className="bg-yellow-500 text-white px-4 py-1 rounded hover:bg-yellow-600"
-          onClick={() => setIsEditing(true)}
-        >
-          Edit
-        </button>
-      </div>
+      <>
+        {task.text}
+       
+      </>
     );
   }
   return (
-    <div className="flex items-center space-x-2">
+    <label className="flex items-center justify-between p-2 border-b border-gray-200">
+      <div className="flex items-center flex-1">
       <input
         type="checkbox"
+        className="mx-2"
         checked={task.done}
         onChange={e => {
-          onChange({
-            ...task,
-            done: e.target.checked
-          });
+        dispatch({
+          type: 'changed',
+          task: {
+          ...task,
+          done: e.target.checked
+          }
+        });
         }}
-        className="form-checkbox h-5 w-5 text-blue-600"
       />
-      {taskContent}
+      <span className={`flex-1 ${task.done ? 'line-through text-gray-500' : ''}`}>
+        {taskContent}
+      </span>
+      </div>
+      <div className="flex items-center">
+      {isEditing ? (
+        <button className="bg-blue-500 text-white px-4 py-2 rounded mx-2" onClick={() => setIsEditing(false)}>
+        Save
+        </button>
+      ) : (
+        <button className="bg-blue-500 text-white px-4 py-2 rounded mx-2" onClick={() => setIsEditing(true)}>
+        Edit
+        </button>
+      )}
       <button
-        className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
-        onClick={() => onDelete(task.id)}
+        className="bg-red-500 text-white px-4 py-2 rounded"
+        onClick={() => {
+        dispatch({
+          type: 'deleted',
+          id: task.id
+        });
+        }}
       >
         Delete
       </button>
-    </div>
+      </div>
+    </label>
   );
 }

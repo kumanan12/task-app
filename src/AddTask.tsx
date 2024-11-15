@@ -1,24 +1,44 @@
 import { useState } from 'react';
+import { useTasksDispatch } from './TasksContext.js';
 
-export default function AddTask({ onAddTask }) {
+export default function AddTask() {
   const [text, setText] = useState('');
+  const dispatch = useTasksDispatch();
   return (
-    <div className="flex items-center space-x-2">
+    <>
       <input
-        className="border border-gray-300 rounded px-2 py-1"
-        placeholder="Add task"
-        value={text}
-        onChange={e => setText(e.target.value)}
+      className="border rounded p-2 mr-2"
+      placeholder="Add task"
+      value={text}
+      onChange={e => setText(e.target.value)}
+      onKeyDown={e => {
+        if (e.key === 'Enter') {
+        setText('');
+        dispatch({
+          type: 'added',
+          id: nextId++,
+          text: text,
+        });
+        }
+      }}
       />
       <button
-        className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
-        onClick={() => {
-          setText('');
-          onAddTask(text);
-        }}
+      className="bg-blue-500 text-white p-2 rounded"
+      onClick={() => {
+        setText('');
+        dispatch({
+        type: 'added',
+        id: nextId++,
+        text: text,
+        });
+
+      }}
+      
       >
-        Add
+      Add
       </button>
-    </div>
+    </>
   );
 }
+
+let nextId = 3;
